@@ -1,0 +1,63 @@
+# Websocket Local: ws://localhost:8000/ws/agent
+# local : uvicorn app.api.websocket_server:app --host 0.0.0.0 --port 8000
+# Guardrail:
+guardrails:
+  sql_injection:
+    enable: true
+    patterns: 
+      - "(?i)\\b(drop|delete|truncate|alter)\\s+(table|database)\\b"
+      - "(?i);\\s*(drop|delete|update|insert)\\b"
+
+# research agent
+research:
+  google_api_key: "${GOOGLE_API_KEY}"
+  google_cse_id: "${GOOGLE_CSE_ID}"
+  num_results: 5
+  max_urls_to_read: 3
+  fetch_timeout_seconds: 10
+  max_chars_per_pages: 5000
+  Google_API_Point : "https://google.serper.dev/search"
+
+# pii masking
+pii_masking :
+  enabled: True
+  rules: 
+    - name: "Email"
+      pattern: "[a-zA-Z0-9.%+-]+@[a-zA-Z0-9.-]+\\[a-zA-Z]{2,}"
+      mask: "[Email]"
+    - name: "Phone"
+      pattern: "(?:\\+91[\\-\\s]?)?[6-9]\\d{9}"
+      mask: "[Mobile Number]"
+
+# Evaluation
+evaluation:
+  enabled: true
+  store: "postgres"
+  table_name: "agent_logs"
+  cloudwatch_log: true
+
+# postgre
+postgre:
+  host: "${POSTGRES_HOST}"
+  port: 5432
+  database: "${POSTGRES_DB}"
+  user: "${POSTGRES_USER}"
+  password: "${POSTGRES_PASSWORD}"
+
+# opensearch
+opensearch:
+  host: "${OPENSEARCH_HOST}"
+  index_name: "${OPENSEARCH_INDEX}"
+  use_aws_auth: "${USE_AWS_OPENSEARCH}"
+  embedding_model:  "${BEDROCK_EMBEDDING_MODEL_ID}"
+  embedding_dimensions: 1024
+  top_k : 5
+  region: "${AWS_REGION}"
+
+# bedrock
+bedrock:
+  service : "bedrock-runtime"
+  region : "${AWS_REGION}"
+  model_id: "us.amazon.nova-lite-v1:0"
+  temperature: 0.0 
+  max_tokens: 2048
