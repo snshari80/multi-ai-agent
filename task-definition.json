@@ -42,9 +42,7 @@
         {
           "name": "GOOGLE_API_POINT",
           "value": "https://google.serper.dev/search"
-        }
-      ],
-      "secrets": [
+        },
         {
           "name": "AWS_REGION",
           "valueFrom": "${AWS_REGION}"
@@ -52,7 +50,9 @@
         {
           "name": "BEDROCK_REGION",
           "valueFrom": "${AWS_REGION}"
-        },
+        }
+      ],
+      "secrets": [
         {
           "name": "OPENAI_API_KEY",
           "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${ACCOUNT_ID}:secret:${AI_AGENT_APP_SECRET}:OPENAI_API_KEY::"
