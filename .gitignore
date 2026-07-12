@@ -42,3 +42,5 @@ dist/
 
 # Notebooks
 .ipynb_checkpoints/
+.env
+.env.local
