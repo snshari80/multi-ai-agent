@@ -4,6 +4,10 @@ from pathlib import Path
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from langchain_core.messages import HumanMessage
+
+from app.service.memory_service import get_memory
+
 
 from app.graph.state import new_state
 from app.graph.workflow import get_graph
@@ -22,7 +26,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/heath")
+
+@app.get("/")
 def health():
     return { "status":"healthy", "message":"multi-agent-api"}
 
@@ -46,6 +51,10 @@ async def agent_websocket(websocket:WebSocket):
             session_id = payload.get("session_id","unknown")
             query = payload.get("query","")
 
+            memory = get_memory(sessionid=session_id)
+
+            history = memory.load_memory_variables({})["history"]
+
             if not query:
                 await websocket.send_json({
                     "event":"error",
@@ -64,8 +73,27 @@ async def agent_websocket(websocket:WebSocket):
             state = new_state(session_id=session_id,user_query=query,emit=emit)
             graph = get_graph()
 
+            user_query = state.get("user_query")
+
+            if "messages" not in state:
+                state["messages"] = [HumanMessage(content=state["user_query"])]
+
+            state["messages"] = history + state["messages"]
+
+            state["messages"] = state.get("messages", []) + [
+                HumanMessage(content=user_query)
+            ]
+
             try:
                 final_state = await graph.ainvoke(state)
+
+                ai_response = final_state["final_response"]
+
+                memory.save_context(
+                    {"input": state["messages"][-1].content},
+                    {"output": ai_response}
+                )
+
             except Exception as e:
                 logger.exception(f"{session_id} Graph execution failed ->{e}")
                 await websocket.send_json({
@@ -77,6 +105,7 @@ async def agent_websocket(websocket:WebSocket):
             await websocket.send_json({
                 "event":"turn_complete",
                 "trace_id":final_state.get("trace_id", ""),
+                "agent" : "evaluator"
             })
 
     

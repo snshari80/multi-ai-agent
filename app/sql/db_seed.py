@@ -6,7 +6,7 @@ import sys
 import psycopg
 
 _PARENT_PATH = Path(__file__).parent
-_ENV_PATH = _PARENT_PATH.parent/".ENV"
+_ENV_PATH = Path().resolve()/".ENV"
 _SEED_SQL = _PARENT_PATH / "seed.sql"
 
 if not _ENV_PATH.exists():

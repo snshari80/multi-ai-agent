@@ -14,6 +14,9 @@ base_prompt = agent_prompt["knowledge_agent_prompt"]
 _SYNTHESIS_PROMPT = """
 {base_prompt}
 
+Chat history:
+{history}
+
 Retrieved context:
 {context}
 
@@ -69,10 +72,10 @@ async def knowledge_agent_node(state:AgentState):
 
     prompt = ChatPromptTemplate.from_template(_SYNTHESIS_PROMPT)
     chain = prompt | get_bedrockllm()
-    response = await asyncio.to_thread(chain.invoke, { "question" : query, "context" : content_block, "base_prompt":base_prompt})
+    response = await asyncio.to_thread(chain.invoke, { "question" : query, "context" : content_block, "base_prompt":base_prompt })
 
     sources = list({c["file_name"] for c in chunks if c["file_name"]})
-    latency = time.time() - start_time * 1000
+    latency = int((time.time() - start_time)) * 1000
 
     return {
         "knowledge_output" : { "chunks" : chunks , "answer" : response.content},
@@ -82,5 +85,5 @@ async def knowledge_agent_node(state:AgentState):
             "sources" : sources,
             "raw" : { "chunks_count" : len(chunks)}
         },
-        "latency_ms": { **state.get("latency_ms",{}), "knowledge" :latency},
+        "latency_ms": { **state.get("latency_ms",{}), "knowledge" :f"{latency} ms"},
     }

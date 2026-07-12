@@ -1,0 +1,132 @@
+{
+  "family": "multiai-agent-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::${ACCOUNT_ID}:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::${ACCOUNT_ID}:role/multi-ai-agent-task-role",
+  "ephemeralStorage": {
+    "sizeInGiB": 50
+  },
+  "containerDefinitions": [
+    {
+      "name": "multi-ai-agent",
+      "image": "${IMAGE_URI}",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8000,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "BEDROCK_EMBEDDING_MODEL_ID",
+          "value": "amazon.titan-embed-text-v2:0"
+        },
+        {
+          "name": "BEDROCK_LLM_MODEL_ID",
+          "value": "us.amazon.nova-lite-v1:0"
+        },
+        {
+          "name": "USE_AWS_OPENSEARCH",
+          "value": "false"
+        },
+        {
+          "name": "BEDROCK_AWS_PROFILE",
+          "value": "bedrock-account"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "GOOGLE_API_POINT",
+          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${ACCOUNT_ID}:secret:${AI_AGENT_APP_SECRET}:GOOGLE_API_POINT::"
+        },
+        {
+          "name": "AWS_REGION",
+          "valueFrom": "${AWS_REGION}"
+        },
+        {
+          "name": "BEDROCK_REGION",
+          "value": "${AWS_REGION}"
+        },
+        {
+          "name": "OPENAI_API_KEY",
+          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${ACCOUNT_ID}:secret:${AI_AGENT_APP_SECRET}:OPENAI_API_KEY::"
+        },
+        {
+          "name": "GOOGLE_API_KEY",
+          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${ACCOUNT_ID}:secret:${AI_AGENT_APP_SECRET}:GOOGLE_API_KEY::"
+        },
+        {
+          "name": "GOOGLE_CSE_ID",
+          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${ACCOUNT_ID}:secret:${AI_AGENT_APP_SECRET}:GOOGLE_CSE_ID::"
+        },
+        {
+          "name": "SERPER_KEY",
+          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${ACCOUNT_ID}:secret:${AI_AGENT_APP_SECRET}:SERPER_KEY::"
+        },
+        {
+          "name": "POSTGRES_HOST",
+          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${ACCOUNT_ID}:secret:${AI_AGENT_APP_SECRET}:POSTGRES_HOST::"
+        },
+        {
+          "name": "POSTGRES_DB",
+          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${ACCOUNT_ID}:secret:${AI_AGENT_APP_SECRET}:POSTGRES_DB::"
+        },
+        {
+          "name": "POSTGRES_USER",
+          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${ACCOUNT_ID}:secret:${AI_AGENT_APP_SECRET}:POSTGRES_USER::"
+        },
+        {
+          "name": "POSTGRES_PASSWORD",
+          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${ACCOUNT_ID}:secret:${AI_AGENT_APP_SECRET}:POSTGRES_PASSWORD::"
+        },
+        {
+          "name": "POSTGRES_PORT",
+          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${ACCOUNT_ID}:secret:${AI_AGENT_APP_SECRET}:POSTGRES_PORT::"
+        },
+        {
+          "name": "POSTGRES_AGENT_DB",
+          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${ACCOUNT_ID}:secret:${AI_AGENT_APP_SECRET}:POSTGRES_AGENT_DB::"
+        },
+        {
+          "name": "BEDROCK_AWS_ACCESS_KEY_ID",
+          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${ACCOUNT_ID}:secret:${AI_AGENT_APP_SECRET}:BEDROCK_AWS_ACCESS_KEY_ID::"
+        },
+        {
+          "name": "BEDROCK_AWS_SECRET_ACCESS_KEY",
+          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${ACCOUNT_ID}:secret:${AI_AGENT_APP_SECRET}:BEDROCK_AWS_SECRET_ACCESS_KEY::"
+        },
+        {
+          "name": "OPENSEARCH_HOST",
+          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${ACCOUNT_ID}:secret:${AI_AGENT_APP_SECRET}:OPENSEARCH_HOST::"
+        },
+        {
+          "name": "OPENSEARCH_INDEX_NAME",
+          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${ACCOUNT_ID}:secret:${AI_AGENT_APP_SECRET}:OPENSEARCH_INDEX_NAME::"
+        },
+        {
+          "name": "OPENSEARCH_USERNAME",
+          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${ACCOUNT_ID}:secret:${AI_AGENT_APP_SECRET}:OPENSEARCH_USERNAME::"
+        },
+        {
+          "name": "OPENSEARCH_PASSWORD",
+          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${ACCOUNT_ID}:secret:${AI_AGENT_APP_SECRET}:OPENSEARCH_PASSWORD::"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/multi-ai-agent",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs",
+          "awslogs-create-group": "true"
+        }
+      }
+    }
+  ]
+}

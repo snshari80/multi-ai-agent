@@ -12,13 +12,14 @@ from dotenv import load_dotenv
 load_dotenv()
 
 _cfg = settings.bedrock
+_cfg_openai = settings.opensearch
 
 @lru_cache(maxsize=1)
 def get_openaillm()->ChatOpenAI:
     return ChatOpenAI(
         model="gpt-4o-mini",
         temperature=0,
-        api_key=os.getenv("OPENAI_API_KEY")
+        api_key=_cfg_openai["openai_api_key"]
     )
 
 @lru_cache(maxsize=1)

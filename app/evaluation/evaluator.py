@@ -9,8 +9,7 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 
-_PARENT_PATH = Path(__file__).parent
-_ENV_PATH = _PARENT_PATH.parent/".ENV"
+_ENV_PATH = Path().resolve()/".ENV"
 
 load_dotenv(_ENV_PATH)
 

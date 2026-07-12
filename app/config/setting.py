@@ -53,6 +53,10 @@ class Settings:
         return self._config["evaluation"]
     
     @property
+    def routing(self):
+        return self._config["routing"]
+    
+    @property
     def postgres(self):
         return self._config["postgre"]
     

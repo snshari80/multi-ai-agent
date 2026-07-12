@@ -7,6 +7,7 @@ import asyncio
 from app.service.google_service import (google_search_service, read_url)
 from app.service.llm_service import get_openaillm
 from langchain_core.prompts import PromptTemplate
+from app.service.memory_service import rewrite_query_with_context
 
 agent_prompt = get_prompts.prompt
 base_prompt = agent_prompt["research_agent_prompt"]
@@ -14,6 +15,7 @@ base_prompt = agent_prompt["research_agent_prompt"]
 
 _SYNTHESIS_PROMPT = """
 {base_prompt}
+
 Sources:
 {sources}
 Question:{questions}
@@ -26,11 +28,16 @@ async def research_agent_node(state:AgentState):
     emit = state.get("emit")
     query = state.get("user_query")
     max_urls = settings.research["max_urls_to_read"]
+    message = state.get("messages")
 
     if emit:
         await emit("agent_progress","research","Searching the web.....")
 
-    search_result = await google_search_service(query)
+    llm = get_openaillm()
+
+    rewrite_query = await rewrite_query_with_context(message,query,llm)
+
+    search_result = await google_search_service(rewrite_query)
 
     if not search_result:
         return {
@@ -74,10 +81,11 @@ async def research_agent_node(state:AgentState):
     if emit:
         await emit("agent_progress","research","Synthesising answer from sources....")
         logger.info(f"Synthesising answer from sources....")
+
     prompt_template = PromptTemplate.from_template(_SYNTHESIS_PROMPT)
     chain = prompt_template | get_openaillm()
     response = await asyncio.to_thread(chain.invoke, {"sources":sources_block , "questions":query , "base_prompt":base_prompt })
-    latency = (time.time() - start_time)*1000
+    latency = int((time.time() - start_time)*1000)
 
     return {
         "reaserch_output":{
@@ -89,5 +97,5 @@ async def research_agent_node(state:AgentState):
             "content": response.content.strip().lower(),
             "sources":source_url
         },
-        "latency":latency
+        "latency_ms":{**state.get("latency_ms",{}),"research":f"{latency} ms"}
     }
