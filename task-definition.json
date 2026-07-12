@@ -38,13 +38,13 @@
         {
           "name": "BEDROCK_AWS_PROFILE",
           "value": "bedrock-account"
+        },
+        {
+          "name": "GOOGLE_API_POINT",
+          "value": "https://google.serper.dev/search"
         }
       ],
       "secrets": [
-        {
-          "name": "GOOGLE_API_POINT",
-          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${ACCOUNT_ID}:secret:${AI_AGENT_APP_SECRET}:GOOGLE_API_POINT::"
-        },
         {
           "name": "AWS_REGION",
           "valueFrom": "${AWS_REGION}"
