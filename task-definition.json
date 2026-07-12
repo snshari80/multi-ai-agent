@@ -51,7 +51,7 @@
         },
         {
           "name": "BEDROCK_REGION",
-          "value": "${AWS_REGION}"
+          "valueFrom": "${AWS_REGION}"
         },
         {
           "name": "OPENAI_API_KEY",
