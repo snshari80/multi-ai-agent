@@ -45,11 +45,11 @@
         },
         {
           "name": "AWS_REGION",
-          "valueFrom": "${AWS_REGION}"
+          "value": "${AWS_REGION}"
         },
         {
           "name": "BEDROCK_REGION",
-          "valueFrom": "${AWS_REGION}"
+          "value": "${AWS_REGION}"
         }
       ],
       "secrets": [
