@@ -88,7 +88,14 @@ class OpenSearchRetriever:
 
         body = {
             "size": top_k,
-            "query" : { "knn" : {"embedding" : { "vector" : query_vector, "k" : top_k }}},
+            "query" : {
+                "bool":{
+                    "should" : [
+                        { "match": { "content": { "query": query, "boost": 0.5 }}},
+                        { "knn" : {"embedding" : { "vector" : query_vector, "k" : top_k }}},
+                    ]
+                }
+            },
             "_source": { "excludes" : ["embedding"]},
         }
 

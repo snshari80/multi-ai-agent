@@ -14,9 +14,6 @@ base_prompt = agent_prompt["knowledge_agent_prompt"]
 _SYNTHESIS_PROMPT = """
 {base_prompt}
 
-Chat history:
-{history}
-
 Retrieved context:
 {context}
 
